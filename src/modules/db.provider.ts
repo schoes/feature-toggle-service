@@ -43,6 +43,19 @@ export default class DbProvider {
             });
     }
 
+    async updateFeatureToggle(id: string, update: FeatureToggle): Promise<void> {
+        const db = await this.getDBConnection();
+        let collection = db.collection(FEATURE_TOGGLES_COLLECTION);
+        return collection.updateOne({toggleId: id}, update)
+            .then(() => {
+                return Promise.resolve();
+            })
+            .catch((error) => {
+                console.log(error);
+                return Promise.reject(error);
+            });
+    }
+
     async addNewFeatureToggle(featureToggle: FeatureToggle): Promise<void> {
         const db = await this.getDBConnection();
         let collection = db.collection(FEATURE_TOGGLES_COLLECTION);
