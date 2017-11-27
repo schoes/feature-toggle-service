@@ -7,15 +7,13 @@ const FEATURE_TOGGLES_COLLECTION = 'featuretoggles';
 
 export default class DbProvider {
     async getDBConnection(): Promise<any> {
-        return new Promise(((resolve, reject) => {
-            MongoClient.connect(url)
-                .then((db) => {
-                    resolve(db);
-                })
-                .catch((error) => {
-                    reject(error);
-                });
-        }));
+        return MongoClient.connect(url)
+            .then((db) => {
+                return Promise.resolve(db);
+            })
+            .catch((error) => {
+                return Promise.reject(error);
+            });
     };
 
     async getFeatureToggles(): Promise<Array<FeatureToggle>> {
@@ -24,7 +22,6 @@ export default class DbProvider {
         let collection = db.collection(FEATURE_TOGGLES_COLLECTION);
         return collection.find({}).toArray()
             .then((result) => {
-                console.log('FeatureToggles: ', result);
                 return Promise.resolve(result);
             })
             .catch((error) => {
@@ -38,7 +35,6 @@ export default class DbProvider {
         let collection = db.collection(FEATURE_TOGGLES_COLLECTION);
         return collection.find({toggleId: id}).toArray()
             .then((result) => {
-                console.log('FeatureToggles: ', result);
                 return Promise.resolve(result[0]);
             })
             .catch((error) => {
@@ -48,7 +44,6 @@ export default class DbProvider {
     }
 
     async addNewFeatureToggle(featureToggle: FeatureToggle): Promise<void> {
-        console.log('added toggle:', featureToggle);
         const db = await this.getDBConnection();
         let collection = db.collection(FEATURE_TOGGLES_COLLECTION);
         return collection.insertOne(featureToggle)
