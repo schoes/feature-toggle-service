@@ -1,10 +1,12 @@
 import * as MongoDB from 'mongodb';
+import {FeatureToggle} from './interfaces';
 
 const MongoClient = MongoDB.MongoClient;
 const url = 'mongodb://featuretoggle:jS8A1OrROWpPkV39i@ds121716.mlab.com:21716/featuretoggle';
+const FEATURE_TOGGLES_COLLECTION = 'featuretoggles';
 
 export default class DbProvider {
-    async connectDB(): Promise<any> {
+    async getDBConnection(): Promise<any> {
         return new Promise(((resolve, reject) => {
             MongoClient.connect(url)
                 .then((db) => {
@@ -16,10 +18,10 @@ export default class DbProvider {
         }));
     };
 
-    async getFeatureToggles(): Promise<any> {
-        const db = await this.connectDB();
+    async getFeatureToggles(): Promise<Array<FeatureToggle>> {
+        const db = await this.getDBConnection();
 
-        let collection = db.collection('featuretoggles');
+        let collection = db.collection(FEATURE_TOGGLES_COLLECTION);
         return collection.find({}).toArray()
             .then((result) => {
                 console.log('FeatureToggles: ', result);
@@ -27,6 +29,43 @@ export default class DbProvider {
             })
             .catch((error) => {
                 console.log(error);
+                return Promise.reject(error);
+            });
+    }
+
+    async getFeatureToggleById(id: string): Promise<FeatureToggle> {
+        const db = await this.getDBConnection();
+        let collection = db.collection(FEATURE_TOGGLES_COLLECTION);
+        return collection.find({toggleId: id}).toArray()
+            .then((result) => {
+                console.log('FeatureToggles: ', result);
+                return Promise.resolve(result[0]);
+            })
+            .catch((error) => {
+                console.log(error);
+                return Promise.reject(error);
+            });
+    }
+
+    async addNewFeatureToggle(featureToggle: FeatureToggle): Promise<void> {
+        console.log('added toggle:', featureToggle);
+        const db = await this.getDBConnection();
+        let collection = db.collection(FEATURE_TOGGLES_COLLECTION);
+        return collection.insertOne(featureToggle)
+            .then(() => {
+                return Promise.resolve();
+            }).catch((error) => {
+                return Promise.reject(error);
+            });
+    }
+
+    async removeFeatureToggleById(id: string): Promise<void> {
+        const db = await this.getDBConnection();
+        let collection = db.collection(FEATURE_TOGGLES_COLLECTION);
+        return collection.deleteOne({toggleId: id})
+            .then(() => {
+                return Promise.resolve();
+            }).catch((error) => {
                 return Promise.reject(error);
             });
     }
