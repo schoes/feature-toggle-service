@@ -15,6 +15,7 @@
     "@nestjs/microservices": "^4.4.0",
     "@nestjs/testing": "^4.4.0",
     "@nestjs/websockets": "^4.4.0",
+    "@types/mongodb": "^2.2.16",
     "assert": "^1.4.1",
     "mongodb": "^2.2.33",
     "redis": "^2.7.1",

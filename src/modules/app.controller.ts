@@ -1,49 +1,30 @@
-import {Body, Controller, Delete, Get, Put, Req} from '@nestjs/common';
-import * as assert from 'assert';
-import * as Mongo from 'mongodb';
-import {FeatureToggle} from './interfaces';
+import {Body, Controller, Delete, Get, Inject, Put, Req, Res} from '@nestjs/common';
 
-const MongoClient = Mongo.MongoCLient;
-const url = 'ds121716.mlab.com:21716/featuretoggle';
+import {FeatureToggle} from './interfaces';
+import DbProvider from './db.provider';
+
 
 @Controller()
 export class AppController {
 
-    constructor() {
-        MongoClient.connect(url, function (err, db) {
-            assert.equal(null, err);
-            console.log('Connected successfully to server');
+    constructor(@Inject('DB') private db: DbProvider) {
 
-            db.close();
-        });
     }
 
     @Get()
-    public root(): Array<FeatureToggle> {
-        return this.getFeatureToggles();
+    public root(@Res() response) {
+        this.db.getFeatureToggles()
+            .then((res) => {
+                response.send(res);
+            });
     }
 
     @Get('/feature-toggles')
-    public getFeatureToggles(): Array<FeatureToggle> {
-        let toggles: Array<FeatureToggle> = [];
-        MongoClient.connect()
-            .then((db) => {
-                let collection = db.collection('featuretoggles');
-                collection.fin({}).toArray()
-                    .then((result) => {
-                        toggles = result;
-                    })
-                    .catch((error) => {
-                        console.error(error);
-                        return [];
-                    });
-            })
-            .catch((error) => {
-                console.error(error);
-                return [];
+    public getFeatureToggles(@Res() response) {
+        this.db.getFeatureToggles()
+            .then((res) => {
+                response.send(res);
             });
-        // TODO remove when promise is ready
-        return [];
     }
 
     @Get('/feature-toggles/:toggleID')
