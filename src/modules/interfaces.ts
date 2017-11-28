@@ -1,10 +1,20 @@
-export class FeatureToggle{
-    constructor(){
+export class FeatureToggle {
+    constructor() {
         this.isActivated = false;
     }
-    activationDate:string;
-    deactivationDate:string;
-    toggleId:string;
-    isActivated:boolean;
-    uuid:string;
+
+    toggleId: string;
+    isActivated: boolean;
+    activeInVersion?: string;
+    toggleType: APPLICATION_TYPE;
+}
+
+export enum APPLICATION_TYPE {
+    PORTAL, APP, UNKNOWN
+}
+
+export class FeatureToggleUpdate {
+    toggleId: string;
+    isActivated: boolean;
+    activeInVersion?: string;
 }
