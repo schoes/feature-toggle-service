@@ -14,7 +14,7 @@ export enum APPLICATION_TYPE {
 }
 
 export class FeatureToggleUpdate {
-    toggleId: string;
     isActivated: boolean;
     activeInVersion?: string;
+    toggleType: APPLICATION_TYPE;
 }

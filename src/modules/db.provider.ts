@@ -1,5 +1,5 @@
 import * as MongoDB from 'mongodb';
-import {FeatureToggle} from './interfaces';
+import {FeatureToggle, FeatureToggleUpdate} from './interfaces';
 
 const MongoClient = MongoDB.MongoClient;
 const url = 'mongodb://featuretoggle:jS8A1OrROWpPkV39i@ds121716.mlab.com:21716/featuretoggle';
@@ -43,10 +43,14 @@ export default class DbProvider {
             });
     }
 
-    async updateFeatureToggle(id: string, update: FeatureToggle): Promise<void> {
+    async updateFeatureToggle(id: string, update: FeatureToggleUpdate): Promise<void> {
         const db = await this.getDBConnection();
         let collection = db.collection(FEATURE_TOGGLES_COLLECTION);
-        return collection.updateOne({toggleId: id}, update)
+        return collection.updateOne({toggleId: id}, {
+            isActivated: update.isActivated,
+            activeInVersion: update.activeInVersion,
+            toggleType: update.toggleType
+        })
             .then(() => {
                 return Promise.resolve();
             })

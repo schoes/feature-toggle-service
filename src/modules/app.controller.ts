@@ -1,6 +1,6 @@
 import {Body, Controller, Delete, Get, Inject, Param, Post, Put, Res} from '@nestjs/common';
 
-import {FeatureToggle} from './interfaces';
+import {FeatureToggle, FeatureToggleUpdate} from './interfaces';
 import DbProvider from './db.provider';
 
 
@@ -8,6 +8,23 @@ import DbProvider from './db.provider';
 export class AppController {
 
     constructor(@Inject('DB') private db: DbProvider) {
+
+    }
+
+    @Get('/ping')
+    public ping() {
+
+    }
+
+    @Get('/shakedown')
+    public async shakedown(@Res() response) {
+        try {
+            await this.db.getFeatureToggles();
+            response.sendStatus(200);
+        }
+        catch (error) {
+            response.sendStatus(500);
+        }
 
     }
 
@@ -30,11 +47,11 @@ export class AppController {
     }
 
     @Put('/feature-toggles/:toggleID')
-    public async updateFeatureToggle(@Param('toggleID') toggleID, @Body() featureToggle: FeatureToggle, @Res() response) {
+    public async updateFeatureToggle(@Param('toggleID') toggleID, @Body() featureToggle: FeatureToggleUpdate, @Res() response) {
         console.log('add new feature toggle:', featureToggle);
         delete featureToggle.toggleId;
         try {
-            await this.db.updateFeatureToggle(toggleID, featureToggle);
+            await this.db.updateFeatureToggle(toggleID, );
             response.sendStatus(200);
         }
         catch (error) {
